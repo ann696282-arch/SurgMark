@@ -10,8 +10,15 @@ class ServiceTests(unittest.TestCase):
         self.url = 'http://127.0.0.1:8765'
 
     def test_local_ui_and_status(self):
-        self.assertEqual(self.client.get('/', base_url=self.url).status_code, 200)
+        with self.client.get('/', base_url=self.url) as response:
+            self.assertEqual(response.status_code, 200)
         self.assertIn('models', self.client.get('/api/status', base_url=self.url).json)
+
+    def test_esd_assets_are_served(self):
+        for path in ['app.js','esd-core.js','style.css']:
+            with self.client.get('/'+path, base_url=self.url) as response:
+                self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.client.get('/server.py', base_url=self.url).status_code, 404)
 
     def test_cross_origin_blocked(self):
         r = self.client.post('/api/classify', base_url=self.url, headers={'Origin': 'https://external.example'}, json={})

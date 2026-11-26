@@ -55,6 +55,13 @@ def index():
     return send_from_directory(ROOT, 'index.html')
 
 
+@app.get('/<name>')
+def static_asset(name):
+    if name not in ('app.js', 'esd-core.js', 'style.css', 'legacy-v1.html'):
+        return jsonify(error='Not found'), 404
+    return send_from_directory(ROOT, name)
+
+
 @app.get('/api/status')
 def status():
     return jsonify(models={k: (ROOT / 'models' / k / 'config.json').exists() for k in IDS})

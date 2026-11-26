@@ -1,42 +1,14 @@
-手术视频标注工作台 v1
-Windows / macOS：用 Chrome 或 Edge 打开 index.html。无需安装、无需网络。
-1. 选择本地 MP4（建议 H.264 编码）。
-2. 填写病例编号和标注者，选择动作或子阶段。
-3. 播放定位，按 I 设置起点、O 设置终点，Enter 保存。
-4. 技能可选 0/1；支持备注、编辑、删除、时间定位。
-5. 下载项目 JSON 保存进度，CSV 用于数据分析。恢复 JSON 后重选同名视频。
-6. 多位标注者分别保存独立项目，通过 CSV 中 rater 字段区分。
+SurgMark ESD 术标 v3.0.0
+请阅读 README.md 获取安装、标注和导出完整说明。
 
-论文依据：s41551-023-01010-8，Methods，Surgical video samples and annotations，印刷页 790–791。
-论文未披露人工标注使用的软件名称。本工具复现标注工作流程，不是原软件的复制品。
-内置分离动作 c/h/k/m/p/r、缝合动作 R1/R2/L1/C1、三个缝合子阶段和二元技能标签。
-帧率需手动填写；左右键为按时间步进，不保证可变帧率视频的逐编码帧精确定位。
-JSON 不包含视频，务必自行备份视频和项目。缓存可能被浏览器清除。
-本版本为离线浏览器应用，不包含 Windows EXE / macOS DMG 安装包。
+Windows：完整解压后双击 install-windows.cmd；或直接打开 SurgMark-ESD/index.html。
+Mac：完整解压后双击 install-macos.command；或直接打开 SurgMark-ESD/index.html。
+请使用 Chrome 或 Edge，保留所有应用文件。人工标注无需 Python 或网络。
 
-v2：AI 候选与医生审核
-推荐 Python 3.11（Windows / macOS）。在本目录终端运行：
-  python -m venv .venv
-Windows 激活：.venv\Scripts\activate
-Mac 激活：source .venv/bin/activate
-  python -m pip install -r requirements.txt
-  python download_models.py
-  python server.py
-随后用浏览器打开 http://127.0.0.1:8765（不要直接双击 HTML 来调用模型）。
-Mac 上若 python 命令不存在，创建虚拟环境时使用 python3。
-首次模型下载需要联网和足够磁盘空间；后续推理只读取本地模型，视频帧仅发送到本机服务。
-设备选择顺序为 NVIDIA CUDA、Apple MPS、CPU；CPU 也可运行，速度需实测。
+病例 → 素材对应关系 → 会话署名 → 表A主要操作 → 表B状态 → 少量表C质量事件 → 保存项目。
+NA与0级不同，无法评级需写原因。注射只有0/1/NA，其余三种状态为0/1/2/NA。
+输入新医生编号后点击新建独立会话；共识复制源结果为待审核，不覆盖独立结果。
+JSON 不含视频，请保存原视频并定期下载 JSON。导出的 CSV 含全部会话，须按审核状态筛选。
 
-自动预标注：选择内置动作/子阶段，设定抽样间隔与阈值，再生成候选。
-采用 CLIP 对单帧和文字描述的相似度；没有时序动作理解，不等同于论文 SAIS。
-候选包含“其他/不清晰”背景类，低于阈值则跳过；相邻同类候选合并。
-抽样会漏掉短动作，起止边界仅是抽样区间，必须由医生核对；0.55 只是初始参数。
-所有模型结果都为“待审核”，逐段确认/拒绝或编辑；编辑保存即确认。
-CSV 保留相似度、模型来源、审核状态、审核人和审核时间；训练前筛选 accepted。
-拒绝的候选保留用于审计；重复点击生成会增加新候选，不会覆盖已有标注。
-
-SAM：采用轻量 SlimSAM（SAM 架构），暂停后点击“SAM 分割当前帧”，在帧预览中点目标。
-生成当前帧的透明 PNG 掩码，可下载。掩码单独保存，不嵌入标注项目 JSON。
-当前版本未实现视频掩码传播/追踪，也未用分割结果推断动作。
-后续可用医生确认的数据训练手术专用时序识别模型，替换通用 CLIP。
-本次未下载模型权重，也未验证真实手术视频推理、识别准确率或 Windows GPU 环境。
+模型权重不随包分发。AI为可选研究辅助，需要另装 Python 依赖及模型；尚未验证胃ESD识别准确率。
+Windows安装脚本尚未在真实Windows电脑执行；可使用免安装浏览器入口。
